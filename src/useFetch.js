@@ -1,27 +1,27 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 
+// Prevent unnecessary rendering.
+const useCallbackRef = (callback) => {
+  const callbackRef = useRef(callback);
+  useLayoutEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+  return callbackRef;
+};
+
 export const useFetch = (options) => {
   const [data, setData] = useState(null);
-  // Prevent re-rendering every time App.js
-  // calls useFetch
-  const savedOnSuccess = useRef(options.onSuccess);
-
-  // Synchronous version of useEffect
-  useLayoutEffect(() => {
-    // Current saved status.
-    savedOnSuccess.current = options.onSuccess;
-  }, [options.onSuccess]);
+  const savedOnSuccess = useCallbackRef(options.onSuccess);
 
   useEffect(() => {
-    // Debug: Constant re-rendering.
+    // @debug: rendering issues
     console.log('useFetch useEffect');
-    // Debug: Rendering call to "null"
     if (options.url) {
       fetch(options.url)
         .then((response) => response.json())
         .then((json) => {
-          // Ensure states are set.
-          savedOnSuccess.current(json);
+          // Update and set current data
+          savedOnSuccess.current?.(json);
           setData(json);
         });
     }
