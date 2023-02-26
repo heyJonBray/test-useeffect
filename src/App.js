@@ -28,7 +28,7 @@ const useStopwatch = () => {
       /**
        * Calling state with a function:
        */
-      console.log(`Count = ${count}`);
+      //console.log(`Count = ${setCount}`);
       setCount((prev) => prev + 1);
     }, 1000);
     return () => clearInterval(interval);
