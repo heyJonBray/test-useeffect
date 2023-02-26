@@ -13,17 +13,25 @@ export const useFetch = (options) => {
   const [data, setData] = useState(null);
   const savedOnSuccess = useCallbackRef(options.onSuccess);
 
+  // useEffect with cleanup function.
   useEffect(() => {
     // @debug: rendering issues
     console.log('useFetch useEffect');
     if (options.url) {
+      let isCancelled = false;
       fetch(options.url)
         .then((response) => response.json())
         .then((json) => {
-          // Update and set current data
-          savedOnSuccess.current?.(json);
-          setData(json);
+          // Cleanup function check
+          if (!isCancelled) {
+            // Update and set current data
+            savedOnSuccess.current?.(json);
+            setData(json);
+          }
         });
+      return () => {
+        isCancelled = true;
+      };
     }
   }, [options.url]);
 
